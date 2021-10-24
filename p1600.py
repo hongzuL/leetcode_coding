@@ -22,14 +22,11 @@ class ThroneInheritance:
         else:        
             self.king_order = [self.kingName]
         self.dfs(self.king_dict[self.kingName])
-        # for d in self.death_list:
-        #     if d in self.king_order:
-        #         self.king_order.pop(self.king_order.index(d))
         return self.king_order
 
     def dfs(self,child_list):
         for child in child_list:
-            if child not in self.king_order and child not in self.death_list:
+            if child not in self.death_list:
                 self.king_order.append(child)
             if not self.king_dict[child]:
                 # the child list is empty
