@@ -1,79 +1,67 @@
 # 994. Rotting Oranges
+def checkAdjacentMax(grid,row,col):
+    top,bottom,left,right = -1,-1,-1,-1
+    if row-1 >= 0:
+        top = grid[row-1][col]
+    if row + 1 < len(grid):
+        bottom = grid[row+1][col]
+    if col -1 >= 0:
+        left = grid[row][col-1]
+    if col + 1 < len(grid[row]):
+        right = grid[row][col+1]
 
-def checkAdjacent(grid,row,col):
-    adjacent_one_count = 0
-    if grid[row][col] == 2:
-        if row == 0:
-            # row on top edge, bottom need to be checked
-            if grid[row+1][col] == 1:
-                adjacent_one_count += 1
-                grid[row+1][col] = 2
-            if col == 0:
-                # right and bottom
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1] = 2
-            elif col == len(grid[row]) -1:
-                # left and bottom
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-            else:
-                # left, right and bottom
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1] = 2
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-        elif row == len(grid) -1:
-            # row on bgrid = [[2,1,1],[0,1,1],[1,0,1]]ottom edge, top will need to be checked
-            if grid[row+1][col] == 1:
-                adjacent_one_count += 1
-                grid[row+1][col] = 2
-            if col == 0:
-                # top and right
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1] = 2
-            elif col == len(grid[row]) -1:
-                # left and top 
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-            else:
-                # left, right and top
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1] = 2
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-        else:
-            # row is not on the edge therefore top and bottom need to get checked
-            # top grid = [[2,1,1],[0,1,1],[1,0,1]]jacent_one.add((row+1,col))
-            if grid[row-1][col] == 1:
-                adjacent_one_count += 1
-                grid[row-1][col] = 2
-            if col == 0:
-                # right, top and bottom 
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1]  = 2
-            elif col == len(grid[row]) -1:
-                # left, top and bottom 
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-            else:
-                # left, right, top, and bottom
-                if grid[row][col+1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col+1] = 2
-                if grid[row][col-1] == 1:
-                    adjacent_one_count += 1
-                    grid[row][col-1] = 2
-    return adjacent_one_count
+    return max(top,bottom,left,right)
+
+def nearestTwo(grid,row,col,dist,visited):
+    # check the nearest rotting orange
+    # print("**********************************")
+    # displayGrid(dist)
+    if checkAdjacentMax(grid,row,col) == 2:
+        # grid[row][col] = 2
+        dist[row][col] = 1
+        return 1
+    elif checkAdjacentMax(grid,row,col) == 1:
+        # top
+        if row - 1 >= 0 and visited[row-1][col] == 0 and grid[row-1][col] == 1:
+            visited[row-1][col] = 1
+            if nearestTwo(grid,row-1,col,dist,visited) >= 1:  
+                # grid[row-1][col] = 2
+                if dist[row][col] > 0:
+                    dist[row][col] = min(dist[row][col], dist[row-1][col] + 1)
+                else:
+                    dist[row][col] = dist[row-1][col] + 1
+        # bottom
+        if row + 1 < len(grid) and visited[row+1][col] == 0 and grid[row+1][col] == 1:
+            visited[row+1][col] = 1
+            if nearestTwo(grid,row+1,col,dist,visited) >= 1:
+                # grid[row+1][col] = 2
+                if dist[row][col] > 0:
+                    dist[row][col] = min(dist[row][col], dist[row+1][col] + 1)
+                else:
+                    dist[row][col] = dist[row+1][col] + 1
+        # left
+        if col - 1 >= 0 and visited[row][col-1] == 0 and grid[row][col-1] == 1:
+            visited[row][col-1] = 1
+            if nearestTwo(grid,row,col-1,dist,visited) >= 1:
+                # grid[row][col-1] = 2
+                if dist[row][col] > 0:
+                    dist[row][col] = min(dist[row][col], dist[row][col-1] + 1)
+                else:
+                    dist[row][col] = dist[row][col-1] + 1
+        # right
+        if col + 1 < len(grid[row]) and visited[row][col+1] == 0 and grid[row][col+1] == 1:
+            visited[row][col+1] = 1
+            if nearestTwo(grid,row,col+1,dist,visited) >= 1:
+                # grid[row][col+1] = 2
+                if dist[row][col] > 0:
+                    dist[row][col] = min(dist[row][col], dist[row][col+1] + 1)
+                else:
+                    dist[row][col] = dist[row][col+1] + 1
+        return dist[row][col]
+    else:
+        dist[row][col] = -1
+        return -1
+
 
 def displayGrid(grid):
     for row in range(len(grid)):
@@ -82,14 +70,38 @@ def displayGrid(grid):
         print("|")
     
 def orangesRotting(grid):
-    two_index = list()
-    adjacent_one_count = 0
+    minute = 0
+    max_step= 0
+    visited = list()
+    dist = list()
+    for row in range(len(grid)):
+        arow = list()
+        brow = list()
+        for col in range(len(grid[row])):
+            arow.append(0)
+            brow.append(0)
+        visited.append(arow)
+        dist.append(brow)
+    displayGrid(grid)
+    print()
     for row in range(len(grid)):
         for col in range(len(grid[row])):
-            displayGrid(grid)
-            print()
-            adjacent_one_count += checkAdjacent(grid,row,col)
-    return adjacent_one_count
+            if grid[row][col] == 1 and visited[row][col] == 0:
+                visited[row][col] = 1
+                minute = nearestTwo(grid,row,col,dist,visited)
+                if minute != -1:
+                    max_step = max(minute,max_step)
+                else:
+                    print("**********************************")
+                    displayGrid(dist)
+                    return -1
+                # print("=============================")
+                # displayGrid(grid)
+                print()
+    print("**********************************")
+    displayGrid(dist)
 
-grid = [[2,1,1],[0,1,1],[1,0,1]]
+    return max_step
+
+grid = [[1,1,1],[0,1,1],[1,0,2]]
 print(orangesRotting(grid))
