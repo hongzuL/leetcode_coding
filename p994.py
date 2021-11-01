@@ -14,49 +14,62 @@ def checkAdjacentMax(grid,row,col):
 
 def nearestTwo(grid,row,col,dist,visited):
     # check the nearest rotting orange
-    # print("**********************************")
-    # displayGrid(dist)
+    # print("-------------------------")
+    # displayGrid(visited)
     if checkAdjacentMax(grid,row,col) == 2:
-        # grid[row][col] = 2
         dist[row][col] = 1
+        print("**********************************")
+        displayGrid(dist)
         return 1
     elif checkAdjacentMax(grid,row,col) == 1:
+        max_minute = len(grid)*len(grid[0])
+        top,bottom,left,right = max_minute,max_minute,max_minute,max_minute
+        # print("**********************************")
+        # displayGrid(dist)
         # top
-        if row - 1 >= 0 and visited[row-1][col] == 0 and grid[row-1][col] == 1:
-            visited[row-1][col] = 1
-            if nearestTwo(grid,row-1,col,dist,visited) >= 1:  
-                # grid[row-1][col] = 2
-                if dist[row][col] > 0:
-                    dist[row][col] = min(dist[row][col], dist[row-1][col] + 1)
-                else:
+        if row - 1 >= 0 and grid[row-1][col] == 1:                
+            if visited[row-1][col] == 0:
+                visited[row-1][col] = 1
+                if nearestTwo(grid,row-1,col,dist,visited) >= 1:  
                     dist[row][col] = dist[row-1][col] + 1
+            if dist[row-1][col] != 0:
+                top = dist[row-1][col]
+                              
         # bottom
-        if row + 1 < len(grid) and visited[row+1][col] == 0 and grid[row+1][col] == 1:
-            visited[row+1][col] = 1
-            if nearestTwo(grid,row+1,col,dist,visited) >= 1:
-                # grid[row+1][col] = 2
-                if dist[row][col] > 0:
-                    dist[row][col] = min(dist[row][col], dist[row+1][col] + 1)
-                else:
+        if row + 1 < len(grid) and grid[row+1][col] == 1:
+            if visited[row+1][col] == 0:
+                visited[row+1][col] = 1
+                if nearestTwo(grid,row+1,col,dist,visited) >= 1:
                     dist[row][col] = dist[row+1][col] + 1
+            if dist[row+1][col] != 0:
+                bottom = dist[row+1][col]
+
+                   
         # left
-        if col - 1 >= 0 and visited[row][col-1] == 0 and grid[row][col-1] == 1:
-            visited[row][col-1] = 1
-            if nearestTwo(grid,row,col-1,dist,visited) >= 1:
-                # grid[row][col-1] = 2
-                if dist[row][col] > 0:
-                    dist[row][col] = min(dist[row][col], dist[row][col-1] + 1)
-                else:
+        if col - 1 >= 0 and grid[row][col-1] == 1:
+            if visited[row][col-1] == 0:
+                visited[row][col-1] = 1
+                if nearestTwo(grid,row,col-1,dist,visited) >= 1:
                     dist[row][col] = dist[row][col-1] + 1
+            if dist[row][col-1] != 0:
+                left = dist[row][col-1]
+
+            
         # right
-        if col + 1 < len(grid[row]) and visited[row][col+1] == 0 and grid[row][col+1] == 1:
-            visited[row][col+1] = 1
-            if nearestTwo(grid,row,col+1,dist,visited) >= 1:
-                # grid[row][col+1] = 2
-                if dist[row][col] > 0:
-                    dist[row][col] = min(dist[row][col], dist[row][col+1] + 1)
-                else:
+        if col + 1 < len(grid[row]) and grid[row][col+1] == 1:
+            if visited[row][col+1] == 0:
+                visited[row][col+1] = 1
+                if nearestTwo(grid,row,col+1,dist,visited) >= 1:
                     dist[row][col] = dist[row][col+1] + 1
+            if dist[row][col+1] != 0:
+                right = dist[row][col+1]
+
+        print(top,bottom,left,right)
+        dist[row][col] = min(top,bottom,left,right)
+        if dist[row][col] == max_minute or dist[row][col] == 0:
+            dist[row][col] = 0
+        else:
+            dist[row][col] += 1
         return dist[row][col]
     else:
         dist[row][col] = -1
@@ -86,22 +99,31 @@ def orangesRotting(grid):
     print()
     for row in range(len(grid)):
         for col in range(len(grid[row])):
-            if grid[row][col] == 1 and visited[row][col] == 0:
+            if grid[row][col] == 1:
+                # print("=============================")
+                # print(row,col)
+                # print("=============================")
                 visited[row][col] = 1
                 minute = nearestTwo(grid,row,col,dist,visited)
+                # clean visited
+                for i in range(len(visited)):
+                    vrow = visited[i]
+                    for j in range(len(vrow)):
+                        vrow[j] = 0
                 if minute != -1:
                     max_step = max(minute,max_step)
                 else:
-                    print("**********************************")
-                    displayGrid(dist)
                     return -1
-                # print("=============================")
-                # displayGrid(grid)
-                print()
-    print("**********************************")
-    displayGrid(dist)
+                
+                # print()
+    for row in range(len(dist)):
+        for col in range(len(grid[row])):
+            if grid[row][col] == 1 and dist[row][col] == 0:
+                return -1
 
     return max_step
 
-grid = [[1,1,1],[0,1,1],[1,0,2]]
+grid = [[2,0,1,1,1,1,1,1,1,1],[1,0,1,0,0,0,0,0,0,1],[1,0,1,0,1,1,1,1,0,1],[1,0,1,0,1,0,0,1,0,1],[1,0,1,0,1,0,0,1,0,1],[1,0,1,0,1,1,0,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1]]
+# grid = [[1,1,1],[1,0,1],[1,0,2]]
+grid = [[2],[2],[1],[0],[1],[1]]
 print(orangesRotting(grid))
