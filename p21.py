@@ -36,6 +36,19 @@ class Solution:
             temp = temp.next
         return head
 
+    def test83(self, head):
+        result_head = head
+        tmp = head.next    
+        while tmp:
+            if head.val == tmp.val:
+                # found duplicate
+                head.next = tmp.next
+                tmp = head.next
+            else:
+                head = head.next
+                tmp = tmp.next
+        return result_head
+
     def createLinkedList(self, list_vals):
         tmp = ListNode()
         head = tmp
@@ -59,5 +72,8 @@ list1 = [1,2,4,5]
 list2 = [1,3,4]
 list1 = solut.createLinkedList(list1)
 list2 = solut.createLinkedList(list2)
-head = solut.mergeTwoLists(list1, list2)
+# head = solut.mergeTwoLists(list1, list2)
+head = [1,1,1]
+head = solut.createLinkedList(head)
+head = solut.test83(head)
 solut.printLinkedList(head)
